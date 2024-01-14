@@ -1,7 +1,13 @@
+import Counter from "./components/Counter";
+import { Provider } from 'react-redux'
+import store from "./store";
+
 function App() {
   return (
     <>
-     <h1>Redux Education</h1>
+      <Provider store={store}>
+        <Counter/>
+      </Provider>
     </>
   )
 }
