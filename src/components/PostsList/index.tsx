@@ -1,19 +1,46 @@
-import {useAppSelector} from "../../store/hooks.ts";
+import {useAppDispatch, useAppSelector} from "../../store/hooks.ts";
+import {fetchPosts, selectAllPosts, selectError, selectPostStatus} from "../../store/features/posts/postsSlice.ts";
+import {useEffect} from "react";
+import {PostExcerpt} from "../PostExcerpt";
+import {Spinner} from "../Spinner";
 
 export const PostsList = () => {
-  const posts = useAppSelector(state => state.posts)
+  const posts = useAppSelector(selectAllPosts)
+  const postStatus = useAppSelector(selectPostStatus)
+  const error = useAppSelector(selectError)
+  const dispatch = useAppDispatch()
 
-  const renderedPosts = posts.map(post => (
-   <article className="post-excerpt" key={post.id}>
-     <h3>{post.title}</h3>
-     <p className="post-content">{post.content.substring(0, 100)}</p>
-   </article>
-  ))
+  useEffect(() => {
+    if(postStatus === 'idle') {
+      dispatch(fetchPosts())
+    }
+  }, [postStatus, dispatch])
+
+  let content
+
+  if (postStatus === 'loading') {
+    content = <Spinner text="Loading..." />
+  }
+
+  if (postStatus === 'succeeded') {
+    // Sort posts in reverse chronological order by datetime string
+    const orderedPosts = posts
+     .slice()
+     .sort((a, b) => b.date.localeCompare(a.date))
+
+    content = orderedPosts.map(post => (
+     <PostExcerpt key={post.id} post={post} />
+    ))
+  }
+
+  if (postStatus === 'failed') {
+    content = <div>{error}</div>
+  }
 
   return (
     <section className="posts-list">
       <h2>Posts</h2>
-      {renderedPosts}
+      {content}
     </section>
   )
 }

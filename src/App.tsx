@@ -3,6 +3,8 @@ import {PostsList} from "./components/PostsList";
 import {Provider} from "react-redux";
 import store from "./store";
 import {AddPostForm} from "./components/AddPostForm";
+import {SinglePostPage} from "./pages/SinglePostPage";
+import {EditPostForm} from "./components/EditPostForm";
 
 
 function App() {
@@ -16,6 +18,9 @@ function App() {
             <PostsList />
           </>
         }/>
+        <Route path="/posts" element={<PostsList />}/>
+        <Route path="/posts/:postId" element={<SinglePostPage />} />
+        <Route path="/editPost/:postId" element={<EditPostForm />} />
       </Routes>
      </BrowserRouter>
   </Provider>

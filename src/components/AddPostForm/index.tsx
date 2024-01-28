@@ -1,28 +1,43 @@
-import {ChangeEvent, useState} from "react";
-import {useDispatch} from "react-redux";
+import {ChangeEvent, useMemo, useState} from "react";
 import {postAdded} from "../../store/features/posts/postsSlice.ts";
-import {nanoid} from "nanoid";
+import {useAppDispatch, useAppSelector} from "../../store/hooks.ts";
+import {RootState} from "../../store";
 
 export const AddPostForm = () => {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
+  const [userId, setUserId] = useState('')
 
-  const dispatch = useDispatch();
+  const users = useAppSelector((state: RootState) => state.users)
+
+  const dispatch = useAppDispatch();
 
   const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => setTitle(event.target.value)
   const handleContentChange = (event: ChangeEvent<HTMLTextAreaElement>) => setContent(event.target.value)
+  const handleAuthorChange = (event: ChangeEvent<HTMLSelectElement>) => setUserId(event.target.value)
+
   const handleSavePostClick = () => {
     if(title && content) {
-      dispatch(postAdded({
-        id: nanoid(),
+      dispatch(postAdded(
         title,
-        content
-      }))
+        content,
+        userId
+      ))
 
       setTitle('')
       setContent('')
     }
   }
+
+  const canSave = [title, content, userId].every(Boolean)
+
+  const usersOptions = useMemo(() => {
+    return users.map(user => (
+     <option key={user.id} value={user.id}>
+      {user.name}
+    </option>)
+    )
+  }, [users])
 
   return (
    <section>
@@ -36,6 +51,11 @@ export const AddPostForm = () => {
         value={title}
         onChange={handleTitleChange}
        />
+       <label htmlFor="postAuthor">Author:</label>
+       <select id="postAuthor" value={userId} onChange={handleAuthorChange}>
+         <option value=""></option>
+         {usersOptions}
+       </select>
        <label htmlFor="postContent">Content:</label>
        <textarea
         id="postContent"
@@ -43,7 +63,7 @@ export const AddPostForm = () => {
         value={content}
         onChange={handleContentChange}
        />
-       <button type="button" onClick={handleSavePostClick}>Save Post</button>
+       <button type="button" onClick={handleSavePostClick} disabled={!canSave}>Save Post</button>
      </form>
    </section>
   )
