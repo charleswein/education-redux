@@ -1,12 +1,13 @@
-import {TimeAgo} from "../TimeAgo";
-import {PostAuthor} from "../PostAuthor/PostAuthor.tsx";
-import {ReactionButtons} from "../ReactionButtons";
 import {Link} from "react-router-dom";
-import {TPost} from "../../store/features/posts/postsSlice.ts";
+import {selectPostById, TPost} from "../../store/features/posts/postsSlice.ts";
+import {useAppSelector} from "../../store/hooks.ts";
+import {PostAuthor, TimeAgo, ReactionButtons} from "../../components";
 
-export const PostExcerpt = ({ post }: {
-  post: TPost
+export const PostExcerpt = ({ postId }: {
+  postId: TPost["id"]
 }) => {
+  const post = useAppSelector(state => selectPostById(state, postId))
+
   return (
    <article className="post-excerpt">
      <h3>{post.title}</h3>

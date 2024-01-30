@@ -2,15 +2,14 @@ import {Link, useParams} from "react-router-dom";
 import {RootState} from "../../store";
 import {Params} from "../../types.ts";
 import {useAppSelector} from "../../store/hooks.ts";
-import {PostAuthor} from "../../components/PostAuthor/PostAuthor.tsx";
-import {TimeAgo} from "../../components/TimeAgo";
-import {ReactionButtons} from "../../components/ReactionButtons";
+import {PostAuthor, TimeAgo, ReactionButtons} from "../../components";
+
 import {selectPostById} from "../../store/features/posts/postsSlice.ts";
 
 export const SinglePostPage = () => {
   const { postId } = useParams<Params>();
   const post = useAppSelector((state: RootState) =>
-   selectPostById(state, postId))
+   selectPostById(state, postId as string))
 
   if (!post) {
     return (
@@ -25,7 +24,7 @@ export const SinglePostPage = () => {
      <article className="post">
        <h2>{post.title}</h2>
        <div>
-         <PostAuthor userId={post?.userId} />
+         <PostAuthor userId={post.user} />
          <TimeAgo timestamp={post?.date} />
          <ReactionButtons post={post}/>
        </div>

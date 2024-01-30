@@ -1,14 +1,16 @@
 import {ChangeEvent, useMemo, useState} from "react";
-import {postAdded} from "../../store/features/posts/postsSlice.ts";
 import {useAppDispatch, useAppSelector} from "../../store/hooks.ts";
-import {RootState} from "../../store";
+import {addNewPost} from "../../store/features/posts/postsSlice.ts";
+import {selectAllUsers} from "../../store/features/users/usersSlice.ts";
 
 export const AddPostForm = () => {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [userId, setUserId] = useState('')
+  const [addRequestStatus, setAddRequestStatus] = useState('idle')
+  const canSave = [title, content, userId].every(Boolean) && addRequestStatus === 'idle';
 
-  const users = useAppSelector((state: RootState) => state.users)
+  const users = useAppSelector(selectAllUsers)
 
   const dispatch = useAppDispatch();
 
@@ -16,20 +18,23 @@ export const AddPostForm = () => {
   const handleContentChange = (event: ChangeEvent<HTMLTextAreaElement>) => setContent(event.target.value)
   const handleAuthorChange = (event: ChangeEvent<HTMLSelectElement>) => setUserId(event.target.value)
 
-  const handleSavePostClick = () => {
-    if(title && content) {
-      dispatch(postAdded(
-        title,
-        content,
-        userId
-      ))
+  const handleSavePostClick = async () => {
 
-      setTitle('')
-      setContent('')
+    if(canSave) {
+      try {
+        setAddRequestStatus('pending')
+        await dispatch(addNewPost({title, content, user: userId})).unwrap()
+
+        setTitle('')
+        setContent('')
+        setUserId('')
+      } catch (err) {
+        console.error("Failed to save the post: ", err)
+      } finally {
+        setAddRequestStatus('idle')
+      }
     }
   }
-
-  const canSave = [title, content, userId].every(Boolean)
 
   const usersOptions = useMemo(() => {
     return users.map(user => (

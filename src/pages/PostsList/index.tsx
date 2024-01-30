@@ -1,11 +1,15 @@
 import {useAppDispatch, useAppSelector} from "../../store/hooks.ts";
-import {fetchPosts, selectAllPosts, selectError, selectPostStatus} from "../../store/features/posts/postsSlice.ts";
+import {
+  fetchPosts,
+  selectError,
+  selectPostStatus,
+  selectPostIds
+} from "../../store/features/posts/postsSlice.ts";
 import {useEffect} from "react";
-import {PostExcerpt} from "../PostExcerpt";
-import {Spinner} from "../Spinner";
+import {PostExcerpt, Spinner} from "../../components";
 
 export const PostsList = () => {
-  const posts = useAppSelector(selectAllPosts)
+  const orderedPosts = useAppSelector(selectPostIds)
   const postStatus = useAppSelector(selectPostStatus)
   const error = useAppSelector(selectError)
   const dispatch = useAppDispatch()
@@ -16,20 +20,15 @@ export const PostsList = () => {
     }
   }, [postStatus, dispatch])
 
-  let content
+  let content;
 
   if (postStatus === 'loading') {
     content = <Spinner text="Loading..." />
   }
 
   if (postStatus === 'succeeded') {
-    // Sort posts in reverse chronological order by datetime string
-    const orderedPosts = posts
-     .slice()
-     .sort((a, b) => b.date.localeCompare(a.date))
-
-    content = orderedPosts.map(post => (
-     <PostExcerpt key={post.id} post={post} />
+    content = orderedPosts.map(postId => (
+     <PostExcerpt key={postId} postId={postId} />
     ))
   }
 

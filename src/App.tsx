@@ -1,16 +1,22 @@
 import {BrowserRouter, Route, Routes} from "react-router-dom";
-import {PostsList} from "./components/PostsList";
 import {Provider} from "react-redux";
 import store from "./store";
 import {AddPostForm} from "./components/AddPostForm";
-import {SinglePostPage} from "./pages/SinglePostPage";
-import {EditPostForm} from "./components/EditPostForm";
-
+import {
+  SinglePostPage,
+  PostsList,
+  EditPostForm,
+  UserPage,
+  UsersList,
+  NotificationsList
+} from "./pages";
+import {Navbar} from "./components/NavBar";
 
 function App() {
   return (
    <Provider store={store}>
      <BrowserRouter>
+      <Navbar/>
       <Routes>
         <Route path="/" element={
           <>
@@ -21,6 +27,9 @@ function App() {
         <Route path="/posts" element={<PostsList />}/>
         <Route path="/posts/:postId" element={<SinglePostPage />} />
         <Route path="/editPost/:postId" element={<EditPostForm />} />
+        <Route path="/users" element={<UsersList/>} />
+        <Route path="/users/:userId" element={<UserPage/>} />
+        <Route path="/notifications" element={<NotificationsList/>} />
       </Routes>
      </BrowserRouter>
   </Provider>

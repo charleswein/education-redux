@@ -8,7 +8,7 @@ import {useAppDispatch, useAppSelector} from "../../store/hooks.ts";
 export const EditPostForm = () => {
   const { postId} = useParams<Params>();
   const navigate = useNavigate();
-  const post = useAppSelector((state: RootState) => selectPostById(state, postId))
+  const post = useAppSelector((state: RootState) => selectPostById(state, postId as string))
 
   const [title, setTitle] = useState(post?.title)
   const [content, setContent] = useState(post?.content)
