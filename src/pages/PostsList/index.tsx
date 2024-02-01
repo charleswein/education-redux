@@ -1,45 +1,53 @@
-import {useAppDispatch, useAppSelector} from "../../store/hooks.ts";
-import {
-  fetchPosts,
-  selectError,
-  selectPostStatus,
-  selectPostIds
-} from "../../store/features/posts/postsSlice.ts";
-import {useEffect} from "react";
 import {PostExcerpt, Spinner} from "../../components";
+import {useGetPostsQuery} from "../../store/features/api/apiSlice.ts";
+import {useMemo} from "react";
+import classnames from "classnames";
 
 export const PostsList = () => {
-  const orderedPosts = useAppSelector(selectPostIds)
-  const postStatus = useAppSelector(selectPostStatus)
-  const error = useAppSelector(selectError)
-  const dispatch = useAppDispatch()
+  const {
+    data: posts,
+    isLoading,
+    isSuccess,
+    isFetching,
+    isError,
+    error,
+    refetch,
+  } = useGetPostsQuery('')
 
-  useEffect(() => {
-    if(postStatus === 'idle') {
-      dispatch(fetchPosts())
-    }
-  }, [postStatus, dispatch])
+  const sortedPosts = useMemo(() => {
+    const sortedPosts = posts?.slice()
+    // Sort posts in descending chronological order
+    sortedPosts?.sort((a, b) => b.date.localeCompare(a.date))
+    return sortedPosts
+  }, [posts])
 
   let content;
 
-  if (postStatus === 'loading') {
+  if (isLoading) {
     content = <Spinner text="Loading..." />
   }
 
-  if (postStatus === 'succeeded') {
-    content = orderedPosts.map(postId => (
-     <PostExcerpt key={postId} postId={postId} />
+  if (isSuccess) {
+    const renderedPosts = sortedPosts?.map((post) => (
+     <PostExcerpt key={post.id} post={post} />
     ))
+
+    const containerClassname = classnames('posts-container', {
+      disabled: isFetching
+    })
+
+    content = <div className={containerClassname}>{renderedPosts}</div>
   }
 
-  if (postStatus === 'failed') {
-    content = <div>{error}</div>
+  if (isError) {
+    content = <div>{error.toString()}</div>
   }
 
   return (
-    <section className="posts-list">
-      <h2>Posts</h2>
-      {content}
-    </section>
+   <section className="posts-list">
+     <h2>Posts</h2>
+     <button onClick={refetch}>Re-fetch Posts</button>
+     {content}
+   </section>
   )
 }
