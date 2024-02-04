@@ -1,29 +1,22 @@
 import {ChangeEvent, useState} from "react";
-import {postUpdated, selectPostById} from "../../store/features/posts/postsSlice.ts";
 import {Params} from "../../types.ts";
 import {useNavigate, useParams} from "react-router-dom";
-import {RootState} from "../../store";
-import {useAppDispatch, useAppSelector} from "../../store/hooks.ts";
+import {useEditPostMutation, useGetPostQuery} from "../../store/features/api/apiSlice.ts";
 
 export const EditPostForm = () => {
   const { postId} = useParams<Params>();
+  const [updatePost] = useEditPostMutation()
+  const { data: post } = useGetPostQuery(postId as string)
   const navigate = useNavigate();
-  const post = useAppSelector((state: RootState) => selectPostById(state, postId as string))
 
   const [title, setTitle] = useState(post?.title)
   const [content, setContent] = useState(post?.content)
 
-  const dispatch = useAppDispatch();
-
   const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => setTitle(event.target.value)
   const handleContentChange = (event: ChangeEvent<HTMLTextAreaElement>) => setContent(event.target.value)
-  const handleSavePostClick = () => {
-    if(title && content && postId) {
-      dispatch(postUpdated({
-        id: postId,
-        title,
-        content
-      }))
+  const handleSavePostClick = async () => {
+    if(title && content) {
+      await updatePost({id: postId as string, title, content})
 
       navigate(`/posts/${postId}`)
     }

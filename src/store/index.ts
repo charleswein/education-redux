@@ -1,22 +1,20 @@
 import { configureStore } from '@reduxjs/toolkit'
 import postsReducer from "./features/posts/postsSlice.ts";
-import usersReducer from "./features/users/usersSlice.ts";
 import notificationsSlice from "./features/notifications/notificationsSlice.ts";
-import {apiSlice} from "./features/api/apiSlice.ts";
+import {extendedApiSlice} from "./features/users/usersSlice.ts";
 
 const store = configureStore({
   reducer: {
     posts: postsReducer,
-    users: usersReducer,
     notifications: notificationsSlice,
-    [apiSlice.reducerPath]: apiSlice.reducer
+    [extendedApiSlice.reducerPath]: extendedApiSlice.reducer
   },
   devTools: {
     trace: true,
     traceLimit: 25
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(apiSlice.middleware)
+    getDefaultMiddleware().concat(extendedApiSlice.middleware)
 })
 
 export default store;

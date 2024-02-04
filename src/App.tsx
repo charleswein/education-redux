@@ -1,7 +1,7 @@
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import {Provider} from "react-redux";
 import store from "./store";
-import {AddPostForm} from "./components/AddPostForm";
+import {AddPostForm} from "./components";
 import {
   SinglePostPage,
   PostsList,
@@ -10,7 +10,7 @@ import {
   UsersList,
   NotificationsList
 } from "./pages";
-import {Navbar} from "./components/NavBar";
+import {Navbar} from "./components";
 
 function App() {
   return (
