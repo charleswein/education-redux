@@ -2,13 +2,18 @@ import { formatDistanceToNow, parseISO } from 'date-fns'
 
 import { selectAllUsers } from '../../store/features/users/usersSlice.ts'
 
-import {allNotificationsRead, selectAllNotifications} from '../../store/features/notifications/notificationsSlice.ts'
+import {
+  allNotificationsRead,
+  selectMetadataEntities,
+  useGetNotificationsQuery
+} from '../../store/features/notifications/notificationsSlice.ts'
 import {useAppDispatch, useAppSelector} from "../../store/hooks.ts";
 import {useLayoutEffect} from "react";
 import classnames from 'classnames';
 
 export const NotificationsList = () => {
-  const notifications = useAppSelector(selectAllNotifications)
+  const { data: notifications = [] } = useGetNotificationsQuery()
+  const notificationsMetadata = useAppSelector(selectMetadataEntities)
   const users = useAppSelector(selectAllUsers)
   const dispatch = useAppDispatch()
 
@@ -24,8 +29,10 @@ export const NotificationsList = () => {
       name: 'Unknown User'
     }
 
+    const metadata = notificationsMetadata[notification.id]
+
     const notificationClassname = classnames('notification', {
-      new: notification.isNew
+      new: metadata.isNew
     })
 
     return (

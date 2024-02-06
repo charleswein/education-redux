@@ -12,7 +12,7 @@ export const PostsList = () => {
     isError,
     error,
     refetch,
-  } = useGetPostsQuery('')
+  } = useGetPostsQuery(undefined)
 
   const sortedPosts = useMemo(() => {
     const sortedPosts = posts?.slice()

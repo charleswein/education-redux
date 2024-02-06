@@ -1,25 +1,29 @@
 import {Link} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../../store/hooks.ts";
-import {fetchNotifications, selectAllNotifications} from "../../store/features/notifications/notificationsSlice.ts";
+import {
+  fetchNotificationsWebsocket,
+  selectNotificationsMetadata,
+  useGetNotificationsQuery
+} from "../../store/features/notifications/notificationsSlice.ts";
 import {ReactNode} from "react";
 
 export const Navbar = () => {
   const dispatch = useAppDispatch();
-  const notifications = useAppSelector(selectAllNotifications)
-  const numberUnreadNotifications = notifications.filter(n => !n.read).length
+  const notificationsMetadata = useAppSelector(selectNotificationsMetadata)
+  const numberUnreadNotifications = notificationsMetadata.filter(notificationMetadata => !notificationMetadata.read).length
+
+  useGetNotificationsQuery()
 
   let unreadNotificationsBadge: ReactNode;
+
+  const fetchNewNotifications = () => {
+    dispatch(fetchNotificationsWebsocket())
+  }
 
   if (numberUnreadNotifications > 0) {
     unreadNotificationsBadge = (
      <span className="badge">{numberUnreadNotifications}</span>
     )
-  }
-
-  console.log(numberUnreadNotifications, notifications, unreadNotificationsBadge)
-
-  const fetchNewNotifications = () => {
-    dispatch(fetchNotifications())
   }
 
   return (
@@ -31,7 +35,7 @@ export const Navbar = () => {
            <Link to="/users">Users</Link>
            <Link to="/notifications">Notifications {unreadNotificationsBadge}</Link>
          </div>
-         <button className="round-button small-container" onClick={fetchNewNotifications}>
+         <button className="button" onClick={fetchNewNotifications}>
            Refresh Notifications
          </button>
        </div>
